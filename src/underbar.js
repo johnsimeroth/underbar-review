@@ -252,12 +252,26 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-
+    // iterate over arguments 2:end
+    // obj.currentkey =
+    for (var i = 1; i < arguments.length; i++) {
+      obj = Object.assign(obj, arguments[i]);
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      var sourceObj = arguments[i];
+      for (var key in sourceObj) {
+        if (obj[key] === undefined) {
+          obj[key] = sourceObj[key];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -300,7 +314,24 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
+  // if cache has current arguments as a key
+  // return value
+  // else run func(arguments)
+  // add result to cache
+  // return result
   _.memoize = function(func) {
+    var cache = {};
+    var memoizedFunc = function() {
+
+      var cacheValue = cache[JSON.stringify(arguments)];
+      if (cacheValue !== undefined) {
+        return cacheValue;
+      }
+      var result = func.apply(null, arguments);
+      cache[JSON.stringify(arguments)] = result;
+      return result;
+    };
+    return memoizedFunc;
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -310,6 +341,7 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    setTimeout.apply(null, arguments);
   };
 
 
@@ -324,8 +356,17 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var result = array.slice();
+    for (var i = result.length - 1; i > 0; i--) {
+      // generate a random number 0-i
+      // swap array[i] with that index
+      var rand = Math.floor(Math.random() * (i + 1));
+      var temp = result[rand];
+      result[rand] = result[i];
+      result[i] = temp;
+    }
+    return result;
   };
-
 
   /**
    * ADVANCED
